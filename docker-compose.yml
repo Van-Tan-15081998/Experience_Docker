@@ -1,0 +1,38 @@
+version: '3'
+
+volumes:
+  db-data:
+
+services:
+  experience-backend:
+    build: ./docker/backend_image
+    ports:
+      - "8080:80"
+    volumes:
+      - ./project/experience_backend:/var/www/html/
+    working_dir: /var/www/html
+    container_name: experience-backend
+    depends_on:
+      - mysql
+    restart: always
+
+  experience-frontend:
+    build: ./docker/frontend_image
+    container_name: experience-frontend
+    command: /bin/sh -c "cd /app && npm install && npm run serve"
+    volumes:
+      - ./project/experience_frontend:/app
+    ports:
+      - "3000:8080"
+
+  mysql:
+    image: mysql:latest
+    container_name: experience-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234abcd
+      MYSQL_DATABASE: db_experience
+      MYSQL_USER: db_experience_user
+      MYSQL_PASSWORD: db_experience_pass
+    ports:
+      - "3306:3306"
